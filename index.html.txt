@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Inspection Pro</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="HomeInspect">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/619/619034.png">
+
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --danger-color: #dc2626;
+            --warning-color: #f97316;
+            --success-color: #16a34a;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .app-title {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            margin-top: 0;
+        }
+
+        .section-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        select, textarea, input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 15px;
+            background: #fff;
+        }
+
+        textarea {
+            resize: vertical;
+            height: 70px;
+        }
+
+        .btn {
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-primary { background: var(--primary-color); color: white; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-success { background: var(--success-color); color: white; }
+        .btn-success:hover { background: #15803d; }
+        .btn-danger { background: var(--danger-color); color: white; }
+        .btn-block { width: 100%; padding: 12px; font-size: 16px; margin-top: 10px; }
+        
+        .btn-print { background-color: #0f172a; color: white; margin-bottom: 15px; }
+
+        .defect-list-section {
+            margin-top: 25px;
+            border-top: 2px solid #e2e8f0;
+            padding-top: 20px;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        @media (min-width: 480px) {
+            .comparison-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        .compare-box {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .compare-box.before { background: #fef2f2; border-color: #fca5a5; }
+        .compare-box.after { background: #f0fdf4; border-color: #86efac; }
+
+        .defect-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .defect-card img, .defect-card canvas {
+            width: 100%;
+            border-radius: 6px;
+            margin-top: 8px;
+            display: block;
+        }
+
+        .canvas-container {
+            position: relative;
+            background: #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+            display: none;
+            margin-top: 8px;
+        }
+
+        .canvas-hint {
+            font-size: 11px;
+            color: var(--danger-color);
+            text-align: center;
+            margin-top: 3px;
+        }
+
+        .badge {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .badge-info { background: #e0f2fe; color: #0369a1; }
+        .badge-round { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+
+        .btn-delete {
+            background: none; border: none; color: var(--danger-color);
+            cursor: pointer; font-weight: bold; float: right; font-size: 13px;
+        }
+
+        .hidden { display: none !important; }
+
+        .print-header { display: none; border-bottom: 3px double #0f172a; padding-bottom: 15px; margin-bottom: 20px; }
+        @media print {
+            body { background: white; padding: 0; }
+            .app-container { max-width: 100%; box-shadow: none; padding: 0; }
+            .section-card, .btn, .form-group, .canvas-hint, .btn-delete, input, select, textarea { display: none !important; }
+            .print-header { display: block; }
+            .defect-card { page-break-inside: avoid; border: 1px solid #cbd5e1; background: #fff; }
+            .comparison-grid { grid-template-columns: 1fr 1fr !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <h2 class="app-title">🏠 Home Inspection Pro</h2>
+    
+    <div class="print-header" id="printHeader">
+        <h2 style="text-align: center; margin-bottom: 5px; color: #2563eb;">รายงานการตรวจรับบ้าน / คอนโด</h2>
+        <h4 style="text-align: center; margin-top: 0;" id="printRoundLabel">-</h4>
+        <p><strong>โครงการ:</strong> <span id="printVillage">-</span> | <strong>บ้านเลขที่:</strong> <span id="printHouseNo">-</span> | <strong>ลูกค้า:</strong> <span id="printCustomer">-</span></p>
+    </div>
+
+    <div class="section-card">
+        <h3>🏢 ข้อมูลโปรเจค & รอบตรวจ (พิมพ์ระบุเอง)</h3>
+        
+        <div id="projectInputArea">
+            <div class="form-group">
+                <label>📌 ชื่อโครงการ / หมู่บ้าน / คอนโด</label>
+                <input type="text" id="inputVillage" placeholder="เช่น ม.แสนสิริ สุขุมวิท" oninput="updateProjectMeta()">
+            </div>
+            <div class="form-group">
+                <label>🚪 บ้านเลขที่ / เลขห้อง</label>
+                <input type="text" id="inputHouseNo" placeholder="เช่น 99/123" oninput="updateProjectMeta()">
+            </div>
+            <div class="form-group">
+                <label>👤 ชื่อลูกค้า</label>
+                <input type="text" id="inputCustomer" placeholder="เช่น คุณสมชาย ดีใจ" oninput="updateProjectMeta()">
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 15px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
+            <label>🔄 รอบการตรวจปัจจุบัน (พิมพ์ระบุเอง)</label>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="inputRoundName" placeholder="เช่น รอบที่ 1" style="flex: 1;">
+                <button class="btn btn-primary" onclick="lockAndLoadRound()">🔄 ดึงข้อมูล/เริ่มรอบนี้</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="mainDefectForm" class="section-card hidden">
+        <h3 id="formTitle">🛠️ บันทึกรายการดีเฟคใหม่</h3>
+        <div class="form-group">
+            <label>📍 ตำแหน่งห้อง / พื้นที่</label>
+            <input type="text" id="roomInput" placeholder="เช่น ห้องนอนใหญ่ ชั้น 2">
+        </div>
+        <div class="form-group">
+            <label>📸 ถ่ายรูป / อัปโหลดรูปภาพดีเฟค</label>
+            <input type="file" id="imageLoader" accept="image/*">
+            <div class="canvas-container" id="mainCanvasContainer">
+                <canvas id="mainImageCanvas"></canvas>
+            </div>
+            <div class="canvas-hint" id="mainCanvasHint" style="display:none;">⚠️ แตะบนรูปภาพเพื่อวงกลมสีแดงชี้จุดดีเฟค</div>
+        </div>
+        <div class="form-group">
+            <label>📝 รายละเอียดดีเฟค</label>
+            <textarea id="defectDetail" placeholder="ระบุอาการดีเฟค..."></textarea>
+        </div>
+        <button class="btn btn-success btn-block" onclick="saveNewDefect()">💾 บันทึกรายการดีเฟคลงรอบนี้</button>
+    </div>
+
+    <button class="btn btn-print btn-block hidden" id="btnPrint" onclick="prepareAndPrint()">🖨️ พิมพ์รายงานเปรียบเทียบเป็น PDF</button>
+
+    <div class="defect-list-section hidden" id="listSection">
+        <h3>📋 รายการตรวจประจำ: <span id="currentRoundTitle" style="color:var(--primary-color);">-</span> (<span id="defectCount">0</span> รายการ)</h3>
+        <div id="defectList"></div>
+    </div>
+</div>
+
+<script>
+    // ลงทะเบียน Service Worker สำหรับการทำงานออฟไลน์ในมือถือ
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('Service Worker Registered'))
+                .catch(err => console.log('Service Worker Register Failed', err));
+        });
+    }
+
+    let db = { village: "", houseNo: "", customer: "", rounds: [] };
+    let currentRoundIndex = -1;
+    let mainLoadedImage = null;
+
+    const mainCanvas = document.getElementById('mainImageCanvas');
+    const mainCtx = mainCanvas.getContext('2d');
+
+    window.onload = function() {
+        const localData = localStorage.getItem('inspection_v4_data');
+        if (localData) {
+            db = JSON.parse(localData);
+            document.getElementById('inputVillage').value = db.village || "";
+            document.getElementById('inputHouseNo').value = db.houseNo || "";
+            document.getElementById('inputCustomer').value = db.customer || "";
+            if (db.rounds.length > 0) {
+                document.getElementById('inputRoundName').value = db.rounds[db.rounds.length - 1].roundName;
+            }
+        }
+    };
+
+    function updateProjectMeta() {
+        db.village = document.getElementById('inputVillage').value.trim();
+        db.houseNo = document.getElementById('inputHouseNo').value.trim();
+        db.customer = document.getElementById('inputCustomer').value.trim();
+        localStorage.setItem('inspection_v4_data', JSON.stringify(db));
+    }
+
+    function lockAndLoadRound() {
+        const roundNameInput = document.getElementById('inputRoundName').value.trim();
+        if (!db.village || !db.houseNo || !roundNameInput) {
+            alert("กรุณากรอกข้อมูลโครงการ บ้านเลขที่ และชื่อรอบตรวจให้ครบถ้วนก่อนครับ");
+            return;
+        }
+
+        let rIndex = db.rounds.findIndex(r => r.roundName.toLowerCase() === roundNameInput.toLowerCase());
+        
+        if (rIndex !== -1) {
+            currentRoundIndex = rIndex;
+        } else {
+            let isFirstRound = db.rounds.length === 0;
+            let newRound = { roundName: roundNameInput, isFirst: isFirstRound, defects: [] };
+
+            if (!isFirstRound) {
+                let prevRound = db.rounds[db.rounds.length - 1];
+                prevRound.defects.forEach(d => {
+                    newRound.defects.push({
+                        id: d.id, room: d.room,
+                        prevDetail: d.isFirst ? d.detail : (d.currentDetail || d.prevDetail),
+                        prevImage: d.isFirst ? d.image : (d.currentImage || d.prevImage),
+                        currentStatus: "🔴 ยังไม่แก้ไข", currentDetail: "", currentImage: ""
+                    });
+                });
+            }
+            db.rounds.push(newRound);
+            currentRoundIndex = db.rounds.length - 1;
+            localStorage.setItem('inspection_v4_data', JSON.stringify(db));
+        }
+
+        document.getElementById('mainDefectForm').classList.remove('hidden');
+        document.getElementById('btnPrint').classList.remove('hidden');
+        document.getElementById('listSection').classList.remove('hidden');
+        document.getElementById('currentRoundTitle').innerText = db.rounds[currentRoundIndex].roundName;
+        
+        if(!db.rounds[currentRoundIndex].isFirst) {
+            document.getElementById('formTitle').innerText = "➕ พบดีเฟคจุดใหม่เพิ่มเติม (ถ้ามี)";
+        } else {
+            document.getElementById('formTitle').innerText = "🛠️ บันทึกรายการดีเฟคประจำรอบที่ 1";
+        }
+        renderDefects();
+    }
+
+    document.getElementById('imageLoader').addEventListener('change', function(e) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const img = new Image();
+            img.onload = function() {
+                mainLoadedImage = img;
+                const maxWidth = 480;
+                mainCanvas.width = maxWidth;
+                mainCanvas.height = img.height * (maxWidth / img.width);
+                mainCtx.drawImage(img, 0, 0, mainCanvas.width, mainCanvas.height);
+                document.getElementById('mainCanvasContainer').style.display = 'block';
+                document.getElementById('mainCanvasHint').style.display = 'block';
+            }
+            img.src = event.target.result;
+        }
+        if(e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
+    });
+
+    mainCanvas.addEventListener('click', function(e) {
+        if (!mainLoadedImage) return;
+        const rect = mainCanvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        mainCtx.strokeStyle = "#dc2626"; mainCtx.lineWidth = 4;
+        mainCtx.beginPath(); mainCtx.arc(x, y, 20, 0, 2 * Math.PI); mainCtx.stroke();
+    });
+
+    function saveNewDefect() {
+        const room = document.getElementById('roomInput').value.trim();
+        const detail = document.getElementById('defectDetail').value.trim();
+        if (!room || !detail) { alert("กรุณาระบุตำแหน่งห้องและรายละเอียดดีเฟคด้วยครับ"); return; }
+
+        let imgData = mainLoadedImage ? mainCanvas.toDataURL() : "";
+        let currentRound = db.rounds[currentRoundIndex];
+        let newDefectItem = { id: Date.now(), room: room, isFirst: currentRound.isFirst };
+
+        if (currentRound.isFirst) {
+            newDefectItem.detail = detail; newDefectItem.image = imgData;
+        } else {
+            newDefectItem.prevDetail = "(จุดใหม่เพิ่มเติมในรอบนี้)"; newDefectItem.prevImage = "";
+            newDefectItem.currentStatus = "🔴 พบจุดใหม่"; newDefectItem.currentDetail = detail; newDefectItem.currentImage = imgData;
+        }
+
+        currentRound.defects.push(newDefectItem);
+        localStorage.setItem('inspection_v4_data', JSON.stringify(db));
+        
+        document.getElementById('roomInput').value = ""; document.getElementById('defectDetail').value = "";
+        document.getElementById('imageLoader').value = ""; document.getElementById('mainCanvasContainer').style.display = 'none';
+        document.getElementById('mainCanvasHint').style.display = 'none'; mainLoadedImage = null;
+        renderDefects();
+    }
+
+    function updateCardText(defectId, text) {
+        let defect = db.rounds[currentRoundIndex].defects.find(d => d.id === defectId);
+        if (defect) { defect.currentDetail = text; localStorage.setItem('inspection_v4_data', JSON.stringify(db)); }
+    }
+
+    function updateCardStatus(defectId, status) {
+        let defect = db.rounds[currentRoundIndex].defects.find(d => d.id === defectId);
+        if (defect) { defect.currentStatus = status; localStorage.setItem('inspection_v4_data', JSON.stringify(db)); }
+    }
+
+    function handleCardImageUpload(e, defectId) {
+        const file = e.target.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            const img = new Image();
+            img.onload = function() {
+                const cvs = document.getElementById(`canvas-${defectId}`);
+                const ctx = cvs.getContext('2d');
+                cvs.width = 460; cvs.height = img.height * (460 / img.width);
+                ctx.drawImage(img, 0, 0, cvs.width, cvs.height);
+                cvs.parentElement.style.display = 'block';
+                let defect = db.rounds[currentRoundIndex].defects.find(d => d.id === defectId);
+                if (defect) { defect.currentImage = cvs.toDataURL(); localStorage.setItem('inspection_v4_data', JSON.stringify(db)); }
+            }
+            img.src = evt.target.result;
+        }
+        reader.readAsDataURL(file);
+    }
+
+    function drawOnCardCanvas(e, defectId) {
+        const cvs = document.getElementById(`canvas-${defectId}`);
+        const ctx = cvs.getContext('2d');
+        const rect = cvs.getBoundingClientRect();
+        const x = e.clientX - rect.left; const y = e.clientY - rect.top;
+        ctx.strokeStyle = "#dc2626"; ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.arc(x, y, 20, 0, 2 * Math.PI); ctx.stroke();
+        let defect = db.rounds[currentRoundIndex].defects.find(d => d.id === defectId);
+        if (defect) { defect.currentImage = cvs.toDataURL(); localStorage.setItem('inspection_v4_data', JSON.stringify(db)); }
+    }
+
+    function deleteDefect(id) {
+        if(confirm("ต้องการลบดีเฟครายการนี้ออกใช่หรือไม่?")) {
+            let currentRound = db.rounds[currentRoundIndex];
+            currentRound.defects = currentRound.defects.filter(d => d.id !== id);
+            localStorage.setItem('inspection_v4_data', JSON.stringify(db));
+            renderDefects();
+        }
+    }
+
+    function renderDefects() {
+        const listContainer = document.getElementById('defectList');
+        listContainer.innerHTML = "";
+        let currentRound = db.rounds[currentRoundIndex];
+        document.getElementById('defectCount').innerText = currentRound.defects.length;
+        currentRound.getCanvasToDraw = [];
+
+        currentRound.defects.forEach((item, index) => {
+            const card = document.createElement('div'); card.className = 'defect-card';
+            if (currentRound.isFirst) {
+                let imgTag = item.image ? `<img src="${item.image}">` : `<p style="color:#94a3b8; font-size:13px;">(ไม่มีรูปภาพแนบ)</p>`;
+                card.innerHTML = `
+                    <button class="btn-delete" onclick="deleteDefect(${item.id})">❌ ลบ</button>
+                    <div><span class="badge badge-info">จุดที่ ${index + 1}</span> <strong style="margin-left:5px; font-size:16px;">📍 ${item.room}</strong></div>
+                    <p style="margin:10px 0 0 0; font-size:14px;"><strong>รายละเอียดดีเฟค:</strong> ${item.detail}</p>${imgTag}`;
+            } else {
+                let prevImgTag = item.prevImage ? `<img src="${item.prevImage}">` : `<p style="color:#94a3b8; font-size:13px;">(ไม่มีรูปภาพในรอบก่อนหน้า)</p>`;
+                card.innerHTML = `
+                    <button class="btn-delete" onclick="deleteDefect(${item.id})">❌ ลบ</button>
+                    <div style="margin-bottom: 10px;"><span class="badge badge-info">จุดที่ ${index + 1}</span> <strong style="margin-left:5px; font-size:16px;">📍 ${item.room}</strong></div>
+                    <div class="comparison-grid">
+                        <div class="compare-box before"><span class="badge badge-round">⏮️ รอบก่อนหน้า</span><p style="font-size:13px; margin:8px 0;">${item.prevDetail}</p>${prevImgTag}</div>
+                        <div class="compare-box after"><span class="badge badge-round">🆕 อัปเดตรอบนี้</span>
+                            <div class="form-group" style="margin-top:8px;">
+                                <select onchange="updateCardStatus(${item.id}, this.value)" style="padding:5px; font-size:13px;">
+                                    <option value="🔴 ยังไม่แก้ไข" ${item.currentStatus==='🔴 ยังไม่แก้ไข'?'selected':''}>🔴 ยังไม่แก้ไข</option>
+                                    <option value="🟡 กำลังแก้ไข" ${item.currentStatus==='🟡 กำลังแก้ไข'?'selected':''}>🟡 กำลังแก้ไข</option>
+                                    <option value="🟢 แก้ไขผ่านแล้ว" ${item.currentStatus==='🟢 แก้ไขผ่านแล้ว'?'selected':''}>🟢 แก้ไขผ่านแล้ว</option>
+                                </select>
+                            </div>
+                            <div class="form-group"><textarea placeholder="พิมพ์บันทึกผลตรวจสอบ..." oninput="updateCardText(${item.id}, this.value)" style="font-size:13px; height:50px;">${item.currentDetail || ''}</textarea></div>
+                            <div class="form-group"><input type="file" accept="image/*" onchange="handleCardImageUpload(event, ${item.id})" style="font-size:12px; padding:4px;">
+                                <div class="canvas-container" style="display:none;"><canvas id="canvas-${item.id}" onclick="drawOnCardCanvas(event, ${item.id})"></canvas><div class="canvas-hint">⚠️ แตะเพื่อวงกลมจุดแก้</div></div>
+                            </div>
+                        </div>
+                    </div>`;
+                if (item.currentImage) { currentRound.getCanvasToDraw.push({ id: item.id, data: item.currentImage }); }
+            }
+            listContainer.appendChild(card);
+        });
+
+        if (currentRound.getCanvasToDraw && currentRound.getCanvasToDraw.length > 0) {
+            currentRound.getCanvasToDraw.forEach(item => {
+                const cvs = document.getElementById(`canvas-${item.id}`);
+                if(cvs) {
+                    const ctx = cvs.getContext('2d'); const img = new Image();
+                    img.onload = function() { cvs.width = 460; cvs.height = img.height * (460 / img.width); ctx.drawImage(img, 0, 0, cvs.width, cvs.height); cvs.parentElement.style.display = 'block'; }
+                    img.src = item.data;
+                }
+            });
+        }
+    }
+
+    function prepareAndPrint() {
+        let currentRound = db.rounds[currentRoundIndex];
+        document.getElementById('printVillage').innerText = db.village;
+        document.getElementById('printHouseNo').innerText = db.houseNo;
+        document.getElementById('printCustomer').innerText = db.customer;
+        document.getElementById('printRoundLabel').innerText = "สรุปรายงานประจำ: " + currentRound.roundName;
+        window.print();
+    }
+</script>
+</body>
+</html>
